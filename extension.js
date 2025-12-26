@@ -28,6 +28,9 @@ class FocusedTreeProvider {
         );
 
         item.resourceUri = element.uri;
+        item.contextValue = isDirectory
+            ? 'focusedExplorerFolder'
+            : 'focusedExplorerFile';
 
         if (!isDirectory) {
             item.command = {
@@ -70,6 +73,50 @@ function updateViewTitle() {
     treeView.title = focusedRoot
         ? path.basename(focusedRoot.fsPath)
         : 'Focused Folder';
+}
+
+function getTargetFolderUri(element) {
+    if (element && element.uri) return element.uri;
+    return focusedRoot;
+}
+
+async function createEntry({ provider, element, type }) {
+    if (!focusedRoot) {
+        vscode.window.showInformationMessage('No focused folder set.');
+        return;
+    }
+
+    const label = type === 'file' ? 'file' : 'folder';
+    const name = await vscode.window.showInputBox({
+        prompt: `New ${label} name`,
+        placeHolder: type === 'file' ? 'example.txt' : 'New Folder',
+    });
+    if (!name) return;
+
+    const baseFolder = getTargetFolderUri(element);
+    if (!baseFolder) return;
+
+    const targetUri = vscode.Uri.joinPath(baseFolder, name);
+
+    try {
+        await vscode.workspace.fs.stat(targetUri);
+        vscode.window.showWarningMessage(
+            `A ${label} named "${name}" already exists.`
+        );
+        return;
+    } catch (error) {
+        if (!(error instanceof vscode.FileSystemError)) {
+            throw error;
+        }
+    }
+
+    if (type === 'folder') {
+        await vscode.workspace.fs.createDirectory(targetUri);
+    } else {
+        await vscode.workspace.fs.writeFile(targetUri, new Uint8Array());
+    }
+
+    provider.refresh();
 }
 
 function setWatcher(provider) {
@@ -121,6 +168,20 @@ function activate(context) {
             provider.refresh();
             updateViewTitle();
         }),
+
+        vscode.commands.registerCommand(
+            'focusedExplorer.newFile',
+            async (element) => {
+                await createEntry({ provider, element, type: 'file' });
+            }
+        ),
+
+        vscode.commands.registerCommand(
+            'focusedExplorer.newFolder',
+            async (element) => {
+                await createEntry({ provider, element, type: 'folder' });
+            }
+        ),
 
         vscode.commands.registerCommand('focusedExplorer.presets', async () => {
             const folders = vscode.workspace.workspaceFolders || [];

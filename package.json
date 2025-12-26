@@ -2,7 +2,7 @@
     "name": "focused-folder",
     "displayName": "Focused Folder",
     "description": "Focus VS Code Explorer on a specific folder",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "engines": {
         "vscode": "^1.60.0"
     },
@@ -15,7 +15,9 @@
     },
     "activationEvents": [
         "onView:focusedExplorer",
-        "onCommand:focusedExplorer.focus"
+        "onCommand:focusedExplorer.focus",
+        "onCommand:focusedExplorer.newFile",
+        "onCommand:focusedExplorer.newFolder"
     ],
     "main": "./extension.js",
     "contributes": {
@@ -44,6 +46,14 @@
             {
                 "command": "focusedExplorer.clear",
                 "title": "Clear Focus"
+            },
+            {
+                "command": "focusedExplorer.newFile",
+                "title": "New File"
+            },
+            {
+                "command": "focusedExplorer.newFolder",
+                "title": "New Folder"
             }
         ],
         "menus": {
@@ -51,6 +61,30 @@
                 {
                     "command": "focusedExplorer.focus",
                     "when": "resourceScheme == 'file'",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "focusedExplorer.newFile",
+                    "when": "view == focusedExplorer && viewItem == focusedExplorerFolder",
+                    "group": "navigation"
+                },
+                {
+                    "command": "focusedExplorer.newFolder",
+                    "when": "view == focusedExplorer && viewItem == focusedExplorerFolder",
+                    "group": "navigation"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "focusedExplorer.newFile",
+                    "when": "view == focusedExplorer",
+                    "group": "navigation"
+                },
+                {
+                    "command": "focusedExplorer.newFolder",
+                    "when": "view == focusedExplorer",
                     "group": "navigation"
                 }
             ]
