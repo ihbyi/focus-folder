@@ -1,33 +1,56 @@
 {
-  "name": "focused-folder",
-  "displayName": "Focused Folder",
-  "description": "Focus on a specific folder",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.107.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [],
-  "main": "./extension.js",
-  "contributes": {
-    "commands": [{
-      "command": "focused-folder.helloWorld",
-      "title": "Hello World"
-    }]
-  },
-  "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.107.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "eslint": "^9.39.1",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
-  }
+    "name": "focused-folder",
+    "displayName": "Focused Folder",
+    "description": "Focus VS Code Explorer on a specific folder",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.107.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onView:focusedExplorer",
+        "onCommand:focusedExplorer.focus"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "views": {
+            "explorer": [
+                {
+                    "id": "focusedExplorer",
+                    "name": "Focused Folder",
+                    "icon": "$(folder)"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "focusedExplorer.focus",
+                "title": "Focus Folder"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "focusedExplorer.focus",
+                    "when": "resourceScheme == 'file'",
+                    "group": "navigation"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "pretest": "npm run lint",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.107.0",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "22.x",
+        "eslint": "^9.39.1",
+        "@vscode/test-cli": "^0.0.12",
+        "@vscode/test-electron": "^2.5.2"
+    }
 }

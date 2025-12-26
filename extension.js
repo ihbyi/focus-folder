@@ -1,36 +1,67 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+let focusedRoot = null;
 
-/**
- * @param {vscode.ExtensionContext} context
- */
-function activate(context) {
+class FocusedTreeProvider {
+    constructor() {
+        this._onDidChangeTreeData = new vscode.EventEmitter();
+        this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+    }
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "focused-folder" is now active!');
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('focused-folder.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
+    async getTreeItem(uri) {
+        const stat = await vscode.workspace.fs.stat(uri);
+        const isDirectory = stat.type === vscode.FileType.Directory;
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Focused Folder!');
-	});
+        const item = new vscode.TreeItem(
+            uri.path.split('/').pop(),
+            isDirectory
+                ? vscode.TreeItemCollapsibleState.Collapsed
+                : vscode.TreeItemCollapsibleState.None
+        );
 
-	context.subscriptions.push(disposable);
+        item.resourceUri = uri;
+
+        if (!isDirectory) {
+            item.command = {
+                command: 'vscode.open',
+                title: 'Open File',
+                arguments: [uri],
+            };
+        }
+
+        return item;
+    }
+
+    async getChildren(element) {
+        if (!focusedRoot) return [];
+
+        const folder = element || focusedRoot;
+        const entries = await vscode.workspace.fs.readDirectory(folder);
+
+        return entries.map(([name]) => vscode.Uri.joinPath(folder, name));
+    }
 }
 
-// This method is called when your extension is deactivated
+function activate(context) {
+    const provider = new FocusedTreeProvider();
+
+    vscode.window.registerTreeDataProvider('focusedExplorer', provider);
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('focusedExplorer.focus', (uri) => {
+            focusedRoot = uri;
+            provider.refresh();
+        })
+    );
+}
+
 function deactivate() {}
 
 module.exports = {
-	activate,
-	deactivate
-}
+    activate,
+    deactivate,
+};
