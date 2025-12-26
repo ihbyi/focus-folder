@@ -15,12 +15,20 @@
     ],
     "main": "./extension.js",
     "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "focusedFolderContainer",
+                    "title": "Focused Folder",
+                    "icon": "$(folder)"
+                }
+            ]
+        },
         "views": {
-            "explorer": [
+            "focusedFolderContainer": [
                 {
                     "id": "focusedExplorer",
-                    "name": "Focused Folder",
-                    "icon": "$(folder)"
+                    "name": "Focused Folder"
                 }
             ]
         },
@@ -28,6 +36,10 @@
             {
                 "command": "focusedExplorer.focus",
                 "title": "Focus Folder"
+            },
+            {
+                "command": "focusedExplorer.clear",
+                "title": "Clear Focus"
             }
         ],
         "menus": {
