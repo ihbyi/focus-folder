@@ -1,65 +1,62 @@
-# focused-folder README
+# Focused Folder
 
-This is the README for your extension "focused-folder". After writing up a brief description, we recommend including the following sections.
+Focused Folder is a VS Code extension that lets you **focus on a specific folder** in your project by opening a **dedicated explorer view** scoped only to that folder.
 
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Perfect for projects with multiple areas like `frontend`, `backend`, `src`, `packages`, etc.
 
 ---
 
-## Working with Markdown
+## ✨ Features
 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+-   📁 Focus on any folder via **right-click → Focus Folder**
+-   🧭 Opens in its **own Activity Bar tab**
+-   🔤 Files sorted like VS Code Explorer (folders first, A–Z)
+-   ⚡ Live updates on file changes
+-   🧹 Clear focus anytime
+-   🧠 Focus lives only for the current workspace session
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
+---
 
-## For more information
+## 🚀 Usage
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+### Focus a folder
 
-**Enjoy!**
+1. Open the VS Code Explorer
+2. Right-click any folder
+3. Click **Focus Folder**
+4. VS Code automatically switches to the **Focused Folder** tab
+
+### Clear focus
+
+-   Run **Clear Focus** from the Command Palette
+
+---
+
+## 📦 Commands
+
+| Command                   | Description                      |
+| ------------------------- | -------------------------------- |
+| `Focus Folder`            | Focus the selected folder        |
+| `Clear Focus`             | Clear the current focus          |
+| `Focused Folder: Presets` | Quickly focus a top-level folder |
+
+---
+
+## 🧠 Behavior
+
+-   Focus is **not persisted** after:
+    -   Closing VS Code
+    -   Closing the project
+    -   Reloading the window
+-   Each workspace session starts clean
+
+---
+
+## 🧩 Why use this?
+
+-   Reduce noise in large repositories
+-   Work faster in scoped areas (frontend / backend)
+-   Keep the default Explorer untouched
+-   Lightweight and native-feeling
+
+---
