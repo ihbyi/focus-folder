@@ -1,7 +1,9 @@
 const vscode = require('vscode');
+const path = require('path');
 
 let focusedRoot = null;
 let watcher = null;
+let treeView = null;
 
 class FocusedTreeProvider {
     constructor(context) {
@@ -15,18 +17,11 @@ class FocusedTreeProvider {
     }
 
     async getTreeItem(element) {
-        if (element.isRoot) {
-            return new vscode.TreeItem(
-                element.label,
-                vscode.TreeItemCollapsibleState.Expanded
-            );
-        }
-
         const stat = await vscode.workspace.fs.stat(element.uri);
         const isDirectory = stat.type === vscode.FileType.Directory;
 
         const item = new vscode.TreeItem(
-            element.uri.path.split('/').pop(),
+            path.basename(element.uri.fsPath),
             isDirectory
                 ? vscode.TreeItemCollapsibleState.Collapsed
                 : vscode.TreeItemCollapsibleState.None
@@ -48,17 +43,7 @@ class FocusedTreeProvider {
     async getChildren(element) {
         if (!focusedRoot) return [];
 
-        if (!element) {
-            return [
-                {
-                    isRoot: true,
-                    label: focusedRoot.path.split('/').pop(),
-                    uri: focusedRoot,
-                },
-            ];
-        }
-
-        const folder = element.uri;
+        const folder = element ? element.uri : focusedRoot;
         const entries = await vscode.workspace.fs.readDirectory(folder);
 
         entries.sort((a, b) => {
@@ -80,6 +65,13 @@ class FocusedTreeProvider {
     }
 }
 
+function updateViewTitle() {
+    if (!treeView) return;
+    treeView.title = focusedRoot
+        ? path.basename(focusedRoot.fsPath)
+        : 'Focused Folder';
+}
+
 function setWatcher(provider) {
     if (watcher) watcher.dispose();
 
@@ -98,7 +90,11 @@ function activate(context) {
 
     const provider = new FocusedTreeProvider(context);
 
-    vscode.window.registerTreeDataProvider('focusedExplorer', provider);
+    treeView = vscode.window.createTreeView('focusedExplorer', {
+        treeDataProvider: provider,
+    });
+    context.subscriptions.push(treeView);
+    updateViewTitle();
 
     if (focusedRoot) setWatcher(provider);
 
@@ -110,6 +106,7 @@ function activate(context) {
                 context.workspaceState.update('focusedRoot', uri.toString());
                 setWatcher(provider);
                 provider.refresh();
+                updateViewTitle();
 
                 await vscode.commands.executeCommand(
                     'workbench.view.extension.focusedFolderContainer'
@@ -122,6 +119,7 @@ function activate(context) {
             context.workspaceState.update('focusedRoot', null);
             if (watcher) watcher.dispose();
             provider.refresh();
+            updateViewTitle();
         }),
 
         vscode.commands.registerCommand('focusedExplorer.presets', async () => {
@@ -144,6 +142,7 @@ function activate(context) {
             );
             setWatcher(provider);
             provider.refresh();
+            updateViewTitle();
 
             await vscode.commands.executeCommand(
                 'workbench.view.extension.focusedFolderContainer'
